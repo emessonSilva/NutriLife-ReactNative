@@ -6,6 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import LoginScreen from "./loginScreen";
 import RegisterFoodScreen from "./registerFoodScreen";
 import RegisteredFoodScreen from "./registeredFoodScreen";
+import SearchHeader from "./searchHeader";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,24 +29,30 @@ export function HomeScreen() {
 
               return <Ionicons name={iconName} size={size} color={color} />;
             },
-            tabBarActiveTintColor: "#008080",
+            tabBarActiveTintColor: "#466546",
             tabBarInactiveTintColor: "gray",
             tabBarStyle: {
               backgroundColor: "#f8f8f8",
               borderTopWidth: 0,
             },
             tabBarLabel: "",
-            headerShown: false,
           })}
         >
-          <Tab.Screen name="Início" component={LoginScreen} />
+          <Tab.Screen
+            name="Início"
+            component={SearchHeader}
+            options={{ headerShown: false }}
+          
+          />
           <Tab.Screen
             name="Registrar Refeição"
             component={RegisterFoodScreen}
+            options={{ headerShown: false }}
           />
           <Tab.Screen
             name="Lista de Refeições"
             component={RegisteredFoodScreen}
+            options={{ headerShown: false }}
           />
         </Tab.Navigator>
       </NavigationContainer>
