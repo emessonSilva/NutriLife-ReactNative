@@ -14,7 +14,7 @@ import {
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
 
-export function RegisteredFoodScreen() {
+export function CookingTipsScreen() {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
   const navigation = useNavigation();
 
@@ -27,7 +27,7 @@ export function RegisteredFoodScreen() {
         >
           <Ionicons name="arrow-back" size={25} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Refeições Cadastradas</Text>
+        <Text style={styles.headerTitle}>Dicas Culinárias</Text>
       </View>
       <View style={styles.cardContainer}></View>
     </KeyboardAvoidingView>
@@ -145,4 +145,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisteredFoodScreen;
+export default CookingTipsScreen;

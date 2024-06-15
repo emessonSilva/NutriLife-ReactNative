@@ -3,7 +3,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "react-native-vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import LoginScreen from "./loginScreen";
 import RegisterFoodScreen from "./registerFoodScreen";
 import RegisteredFoodScreen from "./registeredFoodScreen";
 import SearchHeader from "./searchHeader";
