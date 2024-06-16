@@ -7,9 +7,15 @@ import {
   Text,
   Modal,
 } from "react-native";
+import {
+  useFonts,
+  Rubik_300Light,
+  Rubik_500Medium,
+} from "@expo-google-fonts/rubik";
 import { Ionicons } from "react-native-vector-icons";
 
 const SearchHeader = ({ navigation, onLocate, onProfile, onTips }) => {
+  const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
   const [query, setQuery] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const [logoutConfirmVisible, setLogoutConfirmVisible] = useState(false);
@@ -68,7 +74,7 @@ const SearchHeader = ({ navigation, onLocate, onProfile, onTips }) => {
             <TouchableOpacity onPress={() => navigation.navigate("UserProfileScreen")}>
               <Text style={styles.menuItem}>Perfil</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onTips}>
+            <TouchableOpacity onPress={() => navigation.navigate("CookingTipsScreen")}>
               <Text style={styles.menuItem}>Dicas Culinárias</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleLogoutConfirm}>
@@ -156,6 +162,8 @@ const styles = StyleSheet.create({
   menuItem: {
     fontSize: 18,
     marginVertical: 10,
+    fontFamily: "Rubik_300Light",
+
   },
   logoutOverlay: {
     flex: 1,
@@ -173,6 +181,7 @@ const styles = StyleSheet.create({
   confirmText: {
     fontSize: 18,
     marginBottom: 20,
+    fontFamily: "Rubik_300Light",
   },
   confirmButtons: {
     flexDirection: "row",
@@ -189,6 +198,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontSize: 16,
     color: "#fff",
+    fontFamily: "Rubik_300Light",
   },
 });
 

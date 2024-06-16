@@ -13,16 +13,15 @@ import {
   Rubik_300Light,
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
-
 export function CookingTipsScreen() {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
 
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          //onPress={() => navigation.goBack()}
           style={styles.returnArrow}
         >
           <Ionicons name="arrow-back" size={25} color="white" />
@@ -54,7 +53,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 20,
-    fontFamily: "Rubik_500Medium",
+    fontFamily: "Rubik_300Light",
   },
   cardContainer: {
     display: "flex",
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     textDecorationLine: "none",
-    color: "var(--theme-color)",
+    color: "#466546",
     display: "contents",
   },
   cardFood: {
