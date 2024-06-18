@@ -1,37 +1,34 @@
 import React from "react";
 import {
-  StyleSheet,
-  Text,
   View,
-  KeyboardAvoidingView,
+  Text,
+  StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import { Ionicons } from "react-native-vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import {
   useFonts,
   Rubik_300Light,
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
-export function CookingTipsScreen() {
-  const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
-  //const navigation = useNavigation();
+import { Ionicons } from "react-native-vector-icons";
 
+const CookingTipsScreen = ({ navigation }) => {
+  const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          //onPress={() => navigation.goBack()}
           style={styles.returnArrow}
+          onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={25} color="white" />
+          <Ionicons name="arrow-back-outline" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dicas Culinárias</Text>
       </View>
-      <View style={styles.cardContainer}></View>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

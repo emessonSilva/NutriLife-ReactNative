@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-
+import { useNavigation } from "@react-navigation/native";
 import {
   useFonts,
   Rubik_300Light,
@@ -16,7 +16,17 @@ import {
 } from "@expo-google-fonts/rubik";
 
 export default function LoginScreen() {
+  const navigation = useNavigation();
+
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+
+  const handleLogin = () => {
+    navigation.navigate("MainDrawer");
+  };
+
+  const handleRegister = () => {
+    navigation.navigate("Register");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -43,14 +53,14 @@ export default function LoginScreen() {
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>ENTRAR</Text>
         </TouchableOpacity>
         <View style={styles.registerContainer}>
           <Text style={styles.registerContainerText}>
             Ainda não tem uma conta?{" "}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleRegister}>
             <Text style={styles.link}>Cadastre-se</Text>
           </TouchableOpacity>
         </View>

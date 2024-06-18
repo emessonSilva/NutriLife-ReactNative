@@ -1,22 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
   Image,
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
-
+import { CheckBox } from "react-native-elements";
 import {
   useFonts,
   Rubik_300Light,
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
+import { useNavigation } from "@react-navigation/native";
 
 export function RegisterScreen() {
+  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+  const [checkedItems, setCheckedItems] = useState([]);
+
+  const handleCheckboxToggle = (value) => {
+    if (checkedItems.includes(value)) {
+      setCheckedItems(checkedItems.filter((item) => item !== value));
+    } else {
+      setCheckedItems([...checkedItems, value]);
+    }
+  };
+
+  const goToLogin = () => {
+    navigation.navigate("Login");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -52,15 +67,59 @@ export function RegisterScreen() {
           autoCorrect={false}
           style={[styles.input]}
         />
-        <View style={styles.termsContainer}>
-          <Text style={styles.termsText}>
-            Ao pressionar Criar Conta abaixo, eu concordo com os{" "}
-            <TouchableOpacity>
-              <Text style={styles.link}>
-                Termos de Serviço & Política de Privacidade
-              </Text>
-            </TouchableOpacity>
-          </Text>
+        <Text style={styles.checkboxContainerTitle}>
+          Preferências Alimentares
+        </Text>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            title="Vegano"
+            checked={checkedItems.includes("vegan")}
+            onPress={() => handleCheckboxToggle("vegan")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Vegetariano"
+            checked={checkedItems.includes("vegetarian")}
+            onPress={() => handleCheckboxToggle("vegetarian")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Sem glúten"
+            checked={checkedItems.includes("gluten-free")}
+            onPress={() => handleCheckboxToggle("gluten-free")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Sem leite"
+            checked={checkedItems.includes("lactose-free")}
+            onPress={() => handleCheckboxToggle("lactose-free")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Baixo Carboidrato"
+            checked={checkedItems.includes("low-carb")}
+            onPress={() => handleCheckboxToggle("low-carb")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Pouca Gordura"
+            checked={checkedItems.includes("low-fat")}
+            onPress={() => handleCheckboxToggle("low-fat")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
+          <CheckBox
+            title="Orgânico"
+            checked={checkedItems.includes("organic")}
+            onPress={() => handleCheckboxToggle("organic")}
+            containerStyle={styles.checkbox}
+            textStyle={styles.checkboxText}
+          />
         </View>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>CRIAR CONTA</Text>
@@ -68,7 +127,7 @@ export function RegisterScreen() {
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>
             Já tem uma conta?{" "}
-            <TouchableOpacity>
+            <TouchableOpacity onPress={goToLogin}>
               <Text style={styles.link}>Entre</Text>
             </TouchableOpacity>
           </Text>
@@ -146,16 +205,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Rubik_500Medium",
   },
-  termsContainer: {
+  checkboxContainer: {
     width: "100%",
     alignItems: "flex-start",
-    marginHorizontal: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 20,
   },
-  termsText: {
+  checkbox: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    margin: 0,
+    padding: 0,
+    marginLeft: 0,
+  },
+  checkboxText: {
     fontSize: 16,
-    color: "#333333",
-    textAlign: "left",
+    marginLeft: 5,
     fontFamily: "Rubik_300Light",
+  },
+  checkboxContainerTitle: {
+    display: "flex",
+    justifyContent: "flex-start",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginTop: 10,
   },
   link: {
     color: "#466546",
