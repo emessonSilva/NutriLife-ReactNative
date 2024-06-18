@@ -1,30 +1,42 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_500Medium,
-} from "@expo-google-fonts/rubik";
+import {React, useState } from 'react';
+import { StyleSheet, View, Image, KeyboardAvoidingView, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useFonts, Rubik_300Light, Rubik_500Medium } from '@expo-google-fonts/rubik';
+import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
+  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('https://nutrilife-api.onrender.com/NutriLife/api/users/auth/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciais inválidas');
+      }
+      navigation.navigate('Home');
+    } catch (error) {
+      Alert.alert('Erro ao fazer login', error.message);
+    }
+  };
+
+  const handleRegisterPress = () => {
+    navigation.navigate('Cadastrer');
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View>
-        <Image
-          source={require("../assets/NutriLife-logo.png")}
-          style={styles.logo}
-        />
+        <Image source={require('../assets/NutriLife-logo.png')} style={styles.logo} />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -32,6 +44,8 @@ export default function LoginScreen() {
           placeholderTextColor="#6B6869"
           autoCorrect={false}
           style={styles.input}
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           placeholder="Senha"
@@ -39,18 +53,18 @@ export default function LoginScreen() {
           secureTextEntry
           autoCorrect={false}
           style={[styles.input, { marginTop: 30 }]}
+          value={password}
+          onChangeText={setPassword}
         />
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>ENTRAR</Text>
         </TouchableOpacity>
         <View style={styles.registerContainer}>
-          <Text style={styles.registerContainerText}>
-            Ainda não tem uma conta?{" "}
-          </Text>
-          <TouchableOpacity>
+          <Text style={styles.registerContainerText}>Ainda não tem uma conta? </Text>
+          <TouchableOpacity onPress={handleRegisterPress}>
             <Text style={styles.link}>Cadastre-se</Text>
           </TouchableOpacity>
         </View>
@@ -62,9 +76,9 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#EEEDEB",
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EEEDEB',
   },
   logo: {
     width: 140,
@@ -72,38 +86,38 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   inputContainer: {
-    width: "90%",
-    alignItems: "center",
+    width: '90%',
+    alignItems: 'center',
     marginTop: 20,
   },
   input: {
-    width: "100%",
+    width: '100%',
     height: 50,
     borderRadius: 10,
-    backgroundColor: "#DEE3DD",
+    backgroundColor: '#DEE3DD',
     padding: 15,
     fontSize: 16,
   },
   forgotPassword: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     marginRight: 10,
     marginTop: 10,
   },
   forgotPasswordText: {
-    color: "#466546",
+    color: '#466546',
     fontSize: 15,
-    fontFamily: "Rubik_300Light",
+    fontFamily: 'Rubik_300Light',
   },
   button: {
-    width: "50%",
+    width: '50%',
     height: 60,
     marginTop: 50,
     borderRadius: 10,
-    backgroundColor: "#466546",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#466546',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 8,
@@ -111,26 +125,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 5,
-    color: "white",
+    color: 'white',
     fontSize: 18,
   },
   buttonText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 18,
-    fontFamily: "Rubik_500Medium",
+    fontFamily: 'Rubik_500Medium',
   },
   registerContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginTop: 50,
     fontSize: 25,
   },
   registerContainerText: {
     fontSize: 15,
-    fontFamily: "Rubik_300Light",
+    fontFamily: 'Rubik_300Light',
   },
   link: {
-    color: "#466546",
+    color: '#466546',
     fontSize: 15,
-    fontFamily: "Rubik_300Light",
+    fontFamily: 'Rubik_300Light',
   },
 });

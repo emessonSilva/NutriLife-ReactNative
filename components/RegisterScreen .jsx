@@ -15,8 +15,24 @@ import {
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
 
+
+import { useNavigation } from '@react-navigation/native';
+
+
+
+
+
+
 export function RegisterScreen() {
+  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+
+  const handleLoginPress = () => {
+    navigation.navigate('Login'); 
+  };
+
+
+
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -68,9 +84,9 @@ export function RegisterScreen() {
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>
             Já tem uma conta?{" "}
-            <TouchableOpacity>
-              <Text style={styles.link}>Entre</Text>
-            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLoginPress}>
+            <Text style={styles.link}>Entre</Text>
+          </TouchableOpacity>
           </Text>
         </View>
       </View>
