@@ -12,7 +12,9 @@ import {
   Rubik_300Light,
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
+import AppLoading from "expo-app-loading";
 import { Ionicons } from "react-native-vector-icons";
+
 
 const CookingTipsScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
@@ -83,6 +85,10 @@ const CookingTipsScreen = ({ navigation }) => {
   async function carregarReceitas() {
     const receitasCarregadas = await buscarReceitas();
     setReceitas(receitasCarregadas);
+  }
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
   }
 
   return (
@@ -159,7 +165,7 @@ const styles = StyleSheet.create({
   },
   cardFood: {
     height: 150,
-    width: "250",
+    width: "90%",
     backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
@@ -213,18 +219,18 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 10,
     marginBottom: 10,
-    textAlign: "center"
+    textAlign: "center",
   },
   overlayTitle: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center"
+    textAlign: "center",
   },
   overlayText: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: "center"
+    textAlign: "center",
   },
 });
 

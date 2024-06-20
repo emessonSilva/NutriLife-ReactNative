@@ -1,4 +1,4 @@
-import {React, useState } from "react";
+import { React, useState } from "react";
 import {
   View,
   Text,
@@ -16,14 +16,15 @@ import {
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
 import { useNavigation } from "@react-navigation/native";
+import AppLoading from "expo-app-loading";
 
 export function RegisterScreen() {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
 
   const handleCheckboxToggle = (value) => {
@@ -43,27 +44,35 @@ export function RegisterScreen() {
         password,
       };
 
-      const response = await fetch('https://nutrilife-api.onrender.com/NutriLife/api/users/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      const response = await fetch(
+        "https://nutrilife-api.onrender.com/NutriLife/api/users/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Erro ao criar conta');
+        throw new Error("Erro ao criar conta");
       }
 
-      navigation.navigate('Login');
+      navigation.navigate("Login");
     } catch (error) {
-      Alert.alert('Erro ao criar conta', error.message);
+      Alert.alert("Erro ao criar conta", error.message);
     }
   };
 
   const goToLogin = () => {
     navigation.navigate("Login");
   };
+
+  // Verifica se as fontes não estão carregadas
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <KeyboardAvoidingView style={styles.container}>

@@ -10,7 +10,12 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts, Rubik_300Light, Rubik_500Medium } from "@expo-google-fonts/rubik";
+import {
+  useFonts,
+  Rubik_300Light,
+  Rubik_500Medium,
+} from "@expo-google-fonts/rubik";
+import AppLoading from "expo-app-loading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
@@ -18,38 +23,44 @@ export default function LoginScreen() {
 
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('https://nutrilife-api.onrender.com/NutriLife/api/users/auth/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://nutrilife-api.onrender.com/NutriLife/api/users/auth/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Credenciais inválidas');
+        throw new Error("Credenciais inválidas");
       }
 
       const data = await response.json();
 
-      
-      await AsyncStorage.setItem('userId', data.id);
+      await AsyncStorage.setItem("userId", data.id);
 
-      
-      navigation.navigate('MainDrawer');
+      navigation.navigate("MainDrawer");
     } catch (error) {
-      Alert.alert('Erro ao fazer login', error.message);
+      Alert.alert("Erro ao fazer login", error.message);
     }
   };
 
   const handleRegister = () => {
     navigation.navigate("Register");
   };
+
+  // Verifica se as fontes não estão carregadas
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <KeyboardAvoidingView style={styles.container}>
