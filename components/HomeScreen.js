@@ -1,7 +1,10 @@
-import React from "react";
+import {React, useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "react-native-vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View, StyleSheet } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import RegisterFoodScreen from "./registerFoodScreen";
 import RegisteredFoodScreen from "./registeredFoodScreen";
 
@@ -36,7 +39,7 @@ function HomeScreen() {
       >
         <Tab.Screen
           name="Início"
-          component={EmptyComponent} 
+          component={MapScreen}
           options={{ headerShown: false }}
         />
         <Tab.Screen
@@ -54,8 +57,77 @@ function HomeScreen() {
   );
 }
 
-function EmptyComponent() {
-  return null; 
+function MapScreen() {
+  const [location, setLocation] = useState(null);
+  const [region, setRegion] = useState({
+    latitude: -23.55052,
+    longitude: -46.633309,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  useEffect(() => {
+    getLocationAsync();
+  }, []);
+
+  const getLocationAsync = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permissão para acessar localização não concedida");
+      return;
+    }
+
+    let currentLocation = await Location.getCurrentPositionAsync({});
+    setLocation(currentLocation);
+
+    
+    setRegion({
+      latitude: currentLocation.coords.latitude,
+      longitude: currentLocation.coords.longitude,
+      latitudeDelta: 0.05, 
+      longitudeDelta: 0.05,
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        region={region}
+      >
+        {location && (
+          <>
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }}
+            title={"Sua Localização"}
+            description={"Você está aqui"}
+          />
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude = -8.051264176767653,
+              longitude: location.coords.longitude = -34.8891208889249
+            }}
+            title={"O Vegetariano Restaurante"}
+            description={"Restaurante vegano aqui"}
+          />
+          </>
+        )}
+      </MapView>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  map: {
+    flex: 1,
+  },
+});
 
 export default HomeScreen;
