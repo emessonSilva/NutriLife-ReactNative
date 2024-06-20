@@ -7,7 +7,11 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { useFonts, Rubik_300Light, Rubik_500Medium } from "@expo-google-fonts/rubik";
+import {
+  useFonts,
+  Rubik_300Light,
+  Rubik_500Medium,
+} from "@expo-google-fonts/rubik";
 import { Ionicons } from "react-native-vector-icons";
 
 const CookingTipsScreen = ({ navigation }) => {
@@ -21,17 +25,18 @@ const CookingTipsScreen = ({ navigation }) => {
 
   async function buscarReceitas() {
     try {
-      const url = 'https://nutrilife-api.onrender.com/NutriLife/api/revenues/get';
+      const url =
+        "https://nutrilife-api.onrender.com/NutriLife/api/revenues/get";
       const response = await fetch(url, {
-        mode: 'cors',
+        mode: "cors",
       });
       if (!response.ok) {
-        throw new Error('Não foi possível encontrar as receitas');
+        throw new Error("Não foi possível encontrar as receitas");
       }
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Erro ao buscar receitas:', error.message);
+      console.error("Erro ao buscar receitas:", error.message);
       return [];
     }
   }
@@ -59,18 +64,17 @@ const CookingTipsScreen = ({ navigation }) => {
     try {
       const url = `https://nutrilife-api.onrender.com/NutriLife/api/revenues/get/id/${id}`;
       const response = await fetch(url, {
-        mode: 'cors',
+        mode: "cors",
       });
       if (!response.ok) {
-        throw new Error('Não foi possível obter as informações da receita');
+        throw new Error("Não foi possível obter as informações da receita");
       }
       const receita = await response.json();
       setReceitaSelecionada(receita);
     } catch (error) {
-      console.error('Erro ao carregar detalhes da receita:', error.message);
+      console.error("Erro ao carregar detalhes da receita:", error.message);
     }
   }
-
 
   const fecharDetalhe = () => {
     setReceitaSelecionada(null);
@@ -93,16 +97,17 @@ const CookingTipsScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Dicas Culinárias</Text>
       </View>
 
-      
       <View style={styles.cardContainer}>
-        {receitas.map(receita => criarElementoReceita(receita))}
+        {receitas.map((receita) => criarElementoReceita(receita))}
       </View>
 
-      
       {receitaSelecionada && (
         <View style={styles.overlay}>
           <View style={styles.overlayInner}>
-            <TouchableOpacity onPress={fecharDetalhe} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={fecharDetalhe}
+              style={styles.closeButton}
+            >
               <Ionicons name="close-outline" size={40} color="#000" />
             </TouchableOpacity>
             <Image
@@ -111,7 +116,9 @@ const CookingTipsScreen = ({ navigation }) => {
               resizeMode="cover"
             />
             <Text style={styles.overlayText}>{receitaSelecionada.title}</Text>
-            <Text style={styles.overlayText}>{receitaSelecionada.description}</Text>
+            <Text style={styles.overlayText}>
+              {receitaSelecionada.description}
+            </Text>
           </View>
         </View>
       )}
@@ -151,7 +158,7 @@ const styles = StyleSheet.create({
   },
   cardFood: {
     height: 150,
-    width: "90%",
+    width: 250,
     backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
@@ -168,8 +175,9 @@ const styles = StyleSheet.create({
   },
   cardFoodImage: {
     width: "40%",
-    height: "100%",
+    height: "80%",
     borderRadius: 10,
+    marginLeft: 10,
   },
   cardFoodTitle: {
     fontSize: 18,
@@ -190,8 +198,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: "90%",
-    maxHeight: "90%",
+    width: "80%",
+    height: 500,
   },
   closeButton: {
     position: "absolute",
@@ -200,8 +208,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   overlayImage: {
-    width: "100%",
-    height: 500,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     marginBottom: 10,
   },
