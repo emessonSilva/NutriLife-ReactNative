@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   cardFood: {
     height: 150,
-    width: 250,
+    width: "100%",
     backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
@@ -201,19 +201,22 @@ const styles = StyleSheet.create({
     height: 20,
   },
   overlayImage: {
-    width: 100,
-    height: 100,
+    width: 250,
+    height: 250,
     borderRadius: 10,
     marginBottom: 10,
+    textAlign: "center"
   },
   overlayTitle: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center"
   },
   overlayDescription: {
     fontSize: 16,
     lineHeight: 24,
+    textAlign: "center"
   },
 });
 

@@ -115,7 +115,7 @@ const CookingTipsScreen = ({ navigation }) => {
               style={styles.overlayImage}
               resizeMode="cover"
             />
-            <Text style={styles.overlayText}>{receitaSelecionada.title}</Text>
+            <Text style={styles.overlayTitle}>{receitaSelecionada.title}</Text>
             <Text style={styles.overlayText}>
               {receitaSelecionada.description}
             </Text>
@@ -155,10 +155,11 @@ const styles = StyleSheet.create({
   },
   cardFoodContainer: {
     marginBottom: 20,
+    width: "90%",
   },
   cardFood: {
     height: 150,
-    width: 250,
+    width: "250",
     backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
@@ -208,14 +209,22 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   overlayImage: {
-    width: 100,
-    height: 100,
+    width: 250,
+    height: 250,
     borderRadius: 10,
     marginBottom: 10,
+    textAlign: "center"
+  },
+  overlayTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center"
   },
   overlayText: {
     fontSize: 16,
     lineHeight: 24,
+    textAlign: "center"
   },
 });
 

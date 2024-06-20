@@ -1,4 +1,4 @@
-import {React, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "react-native-vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -80,11 +80,10 @@ function MapScreen() {
     let currentLocation = await Location.getCurrentPositionAsync({});
     setLocation(currentLocation);
 
-    
     setRegion({
       latitude: currentLocation.coords.latitude,
       longitude: currentLocation.coords.longitude,
-      latitudeDelta: 0.05, 
+      latitudeDelta: 0.05,
       longitudeDelta: 0.05,
     });
   };
@@ -97,22 +96,41 @@ function MapScreen() {
       >
         {location && (
           <>
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title={"Sua Localização"}
-            description={"Você está aqui"}
-          />
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude = -8.051264176767653,
-              longitude: location.coords.longitude = -34.8891208889249
-            }}
-            title={"O Vegetariano Restaurante"}
-            description={"Restaurante vegano aqui"}
-          />
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              title={"Sua Localização"}
+              description={"Você está aqui"}
+            />
+            <Marker
+              coordinate={{
+                latitude: -8.051264176767653,
+                longitude: -34.8891208889249
+              }}
+              title={"O Vegetariano Restaurante"}
+              description={"Restaurante vegano aqui"}
+              image={require("../assets/restaurante.png")}
+            />
+            <Marker
+              coordinate={{
+                latitude: -8.057859274091719,
+                longitude: -34.88115727862078
+              }}
+              title={"Restaurante Vida Longa"}
+              description={"Restaurante vegano aqui"}
+              image={require("../assets/restaurante.png")}
+            />
+            <Marker
+              coordinate={{
+                latitude: -8.057604324164435,
+                longitude: -34.88150060137855
+              }}
+              title={"VEGostices"}
+              description={"Comida Nordestina Vegana"}
+              image={require("../assets/restaurante.png")}
+            />
           </>
         )}
       </MapView>
