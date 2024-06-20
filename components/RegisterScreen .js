@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import {React, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { CheckBox } from "react-native-elements";
 import {
@@ -19,6 +20,10 @@ import { useNavigation } from "@react-navigation/native";
 export function RegisterScreen() {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [checkedItems, setCheckedItems] = useState([]);
 
   const handleCheckboxToggle = (value) => {
@@ -26,6 +31,33 @@ export function RegisterScreen() {
       setCheckedItems(checkedItems.filter((item) => item !== value));
     } else {
       setCheckedItems([...checkedItems, value]);
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const userData = {
+        email,
+        name,
+        preferences: checkedItems,
+        password,
+      };
+
+      const response = await fetch('https://nutrilife-api.onrender.com/NutriLife/api/users/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao criar conta');
+      }
+
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert('Erro ao criar conta', error.message);
     }
   };
 
@@ -53,12 +85,16 @@ export function RegisterScreen() {
           placeholderTextColor="#6B6869"
           autoCorrect={false}
           style={styles.input}
+          value={name}
+          onChangeText={setName}
         />
         <TextInput
           placeholder="Email"
           placeholderTextColor="#6B6869"
           autoCorrect={false}
           style={styles.input}
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           placeholder="Senha"
@@ -66,6 +102,8 @@ export function RegisterScreen() {
           secureTextEntry
           autoCorrect={false}
           style={[styles.input]}
+          value={password}
+          onChangeText={setPassword}
         />
         <Text style={styles.checkboxContainerTitle}>
           Preferências Alimentares
@@ -121,7 +159,7 @@ export function RegisterScreen() {
             textStyle={styles.checkboxText}
           />
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>CRIAR CONTA</Text>
         </TouchableOpacity>
         <View style={styles.loginContainer}>

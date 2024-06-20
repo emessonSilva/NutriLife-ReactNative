@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,14 +7,12 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "react-native-vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_500Medium,
-} from "@expo-google-fonts/rubik";
+import { useFonts, Rubik_300Light, Rubik_500Medium } from "@expo-google-fonts/rubik";
+import { Camera } from 'expo-camera';
 
 export function RegisterFoodScreen() {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
@@ -22,6 +20,43 @@ export function RegisterFoodScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [calories, setCalories] = useState("");
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const cameraRef = useRef(null);
+
+  // Função para abrir a câmera
+  const handleOpenCamera = async () => {
+    console.log('Chamando handleOpenCamera...');
+  
+    if (!fontsLoaded) {
+      console.log('As fontes ainda não estão carregadas.');
+      return; // Evita abrir a câmera antes que as fontes estejam carregadas
+    }
+  
+    try {
+      console.log('Aguardando permissão para acessar a câmera...');
+      const { status } = await Camera.requestPermissionsAsync();
+  
+      if (status !== 'granted') {
+        Alert.alert('Permissão necessária', 'É necessário permitir o acesso à câmera para usar esta funcionalidade.');
+        return;
+      }
+  
+      setIsCameraOpen(true);
+    } catch (error) {
+      console.error('Erro ao solicitar permissão de câmera:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar acessar a câmera. Verifique suas configurações e tente novamente.');
+    }
+  };
+  
+
+  // Função para capturar a imagem
+  const handleCaptureImage = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      console.log(photo); // Aqui você pode processar a imagem capturada, por exemplo, salvá-la
+      setIsCameraOpen(false); // Fecha a câmera após capturar a imagem
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -34,36 +69,49 @@ export function RegisterFoodScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Registrar Refeição</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.formContainer}>
-        <Text style={styles.label}>Título</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite um título para a refeição"
-          value={title}
-          onChangeText={setTitle}
-        />
-        <Text style={styles.label}>Descrição</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Digite uma breve descrição da refeição"
-          value={description}
-          onChangeText={setDescription}
-          multiline={true}
-          numberOfLines={7}
-        />
-        <Text style={styles.label}>Calorias</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite quantas calorias tem a refeição"
-          value={calories}
-          onChangeText={setCalories}
-        />
-      </ScrollView>
-      <View style={styles.buttonPhoto}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Abrir Câmera</Text>
-        </TouchableOpacity>
-      </View>
+      {isCameraOpen ? (
+        <View style={styles.cameraContainer}>
+          <Camera
+            style={styles.cameraPreview}
+            ref={cameraRef}
+            type={Camera.Constants.Type.back}
+            ratio="16:9"
+          />
+          <TouchableOpacity style={styles.captureButton} onPress={handleCaptureImage}>
+            <Text style={styles.captureButtonText}>Capturar</Text>
+          </TouchableOpacity>
+          <View style={styles.overlay} />
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.formContainer}>
+          <Text style={styles.label}>Título</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite um título para a refeição"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <Text style={styles.label}>Descrição</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Digite uma breve descrição da refeição"
+            value={description}
+            onChangeText={setDescription}
+            multiline={true}
+            numberOfLines={7}
+          />
+          <Text style={styles.label}>Calorias</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite quantas calorias tem a refeição"
+            value={calories}
+            onChangeText={setCalories}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleOpenCamera}>
+            <Text style={styles.buttonText}>Abrir Câmera</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -89,6 +137,20 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontFamily: "Rubik_500Medium",
+  },
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraPreview: {
+    width: '100%',
+    height: 300,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Ajuste a opacidade ou cor conforme necessário
   },
   formContainer: {
     backgroundColor: "#eeedeb",
@@ -116,10 +178,6 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: "top",
   },
-  buttonPhoto: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
   button: {
     width: "45%",
     height: 50,
@@ -135,11 +193,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
+    alignSelf: "center",
+    marginTop: 20,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontFamily: "Rubik_300Light",
+  },
+  captureButton: {
+    position: 'absolute',
+    bottom: 20,
+    backgroundColor: '#466546',
+    padding: 15,
+    borderRadius: 10,
+  },
+  captureButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily: 'Rubik_300Light',
   },
 });
 

@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "react-native-vector-icons";
-import HomeScreen from "./components/homeScreen";
+import HomeScreen from "./components/HomeScreen";
 import UserProfileScreen from "./components/userProfileScreen";
 import CookingTipsScreen from "./components/cookingTipsScreen";
 import CustomSearchHeader from "./components/CustomSearchHeader";

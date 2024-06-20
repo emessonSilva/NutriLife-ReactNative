@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,21 +7,44 @@ import {
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_500Medium,
-} from "@expo-google-fonts/rubik";
+import { useFonts, Rubik_300Light, Rubik_500Medium } from "@expo-google-fonts/rubik";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const navigation = useNavigation();
 
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
 
-  const handleLogin = () => {
-    navigation.navigate("MainDrawer");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('https://nutrilife-api.onrender.com/NutriLife/api/users/auth/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciais inválidas');
+      }
+
+      const data = await response.json();
+
+      
+      await AsyncStorage.setItem('userId', data.id);
+
+      
+      navigation.navigate('MainDrawer');
+    } catch (error) {
+      Alert.alert('Erro ao fazer login', error.message);
+    }
   };
 
   const handleRegister = () => {
@@ -42,6 +65,8 @@ export default function LoginScreen() {
           placeholderTextColor="#6B6869"
           autoCorrect={false}
           style={styles.input}
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           placeholder="Senha"
@@ -49,6 +74,8 @@ export default function LoginScreen() {
           secureTextEntry
           autoCorrect={false}
           style={[styles.input, { marginTop: 30 }]}
+          value={password}
+          onChangeText={setPassword}
         />
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
