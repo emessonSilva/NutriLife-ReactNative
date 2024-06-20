@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,86 +8,104 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Alert,
+  Image,
 } from "react-native";
-import { Ionicons } from "react-native-vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_500Medium,
-} from "@expo-google-fonts/rubik";
-import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 export function RegisterFoodScreen() {
-  const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
-  const navigation = useNavigation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [calories, setCalories] = useState("");
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const cameraRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  // Função para abrir a câmera
-  const handleOpenCamera = async () => {
-    console.log("Chamando handleOpenCamera...");
-
+  const handlePickImage = async () => {
     try {
-      console.log("Aguardando permissão para acessar a câmera...");
-      const { status } = await Camera.requestPermissionsAsync();
-
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
-          "É necessário permitir o acesso à câmera para usar esta funcionalidade."
+          "É necessário permitir o acesso à galeria para usar esta funcionalidade."
         );
         return;
       }
 
-      setIsCameraOpen(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: result.uri,
+          type: "image/jpeg", // ou "image/png" dependendo do tipo da imagem
+          name: `upload_${Date.now()}`,
+        });
+        formData.append("upload_preset", "r2hjf5ed");
+
+        const response = await axios.post(
+          "https://api.cloudinary.com/v1_1/dfrngbz8u/image/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.data.secure_url) {
+          setSelectedImage(response.data.secure_url);
+        }
+      }
     } catch (error) {
-      console.error("Erro ao solicitar permissão de câmera:", error);
+      console.error("Erro ao selecionar imagem da galeria:", error);
       Alert.alert(
         "Erro",
-        "Ocorreu um erro ao tentar acessar a câmera. Verifique suas configurações e tente novamente."
+        "Ocorreu um erro ao tentar acessar a galeria. Verifique suas configurações e tente novamente."
       );
     }
   };
 
-  // Função para capturar a imagem
-  const handleCaptureImage = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      console.log(photo); // Aqui você pode processar a imagem capturada, por exemplo, salvá-la
-      setIsCameraOpen(false); // Fecha a câmera após capturar a imagem
+  const handleFormSubmit = async () => {
+    try {
+      const mealData = {
+        title,
+        description,
+        calories,
+        img_url: selectedImage,
+      };
+
+      // Substituir pela URL correta da sua API e o método correto (POST, PUT, etc.)
+      const response = await axios.post('https://nutrilife-api.onrender.com/NutriLife/api/meals/create/', mealData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log('Refeição cadastrada com sucesso!');
+        navigation.navigate('MainDrawer');
+        // Navegar para a próxima tela ou realizar ações necessárias
+      } else {
+        console.error('Erro ao cadastrar refeição:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar refeição:', error.message);
     }
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        {/* <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.returnArrow}
-        >
-          <Ionicons name="arrow-back" size={25} color="white" />
-        </TouchableOpacity> */}
         <Text style={styles.headerTitle}>Registrar Refeição</Text>
       </View>
-      {isCameraOpen ? (
-        <View style={styles.cameraContainer}>
-          <Camera
-            style={styles.cameraPreview}
-            ref={cameraRef}
-            type={Camera.Constants.Type.back}
-            ratio="16:9"
-          />
-          <TouchableOpacity
-            style={styles.captureButton}
-            onPress={handleCaptureImage}
-          >
-            <Text style={styles.captureButtonText}>Capturar</Text>
-          </TouchableOpacity>
-          <View style={styles.overlay} />
+      {selectedImage ? (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.formContainer}>
@@ -114,8 +132,11 @@ export function RegisterFoodScreen() {
             value={calories}
             onChangeText={setCalories}
           />
-          <TouchableOpacity style={styles.button} onPress={handleOpenCamera}>
-            <Text style={styles.buttonText}>Abrir Câmera</Text>
+          <TouchableOpacity style={styles.button} onPress={handlePickImage}>
+            <Text style={styles.buttonText}>Selecionar Imagem da Galeria</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleFormSubmit}>
+            <Text style={styles.buttonText}>Salvar Refeição</Text>
           </TouchableOpacity>
         </ScrollView>
       )}
@@ -136,28 +157,19 @@ const styles = StyleSheet.create({
     padding: 20,
     position: "relative",
   },
-  returnArrow: {
-    position: "absolute",
-    left: 20,
-  },
   headerTitle: {
     color: "#fff",
     fontSize: 20,
     fontFamily: "Rubik_500Medium",
   },
-  cameraContainer: {
-    flex: 1,
-    backgroundColor: "black",
-    justifyContent: "center",
+  imageContainer: {
     alignItems: "center",
+    marginTop: 20,
   },
-  cameraPreview: {
-    width: "100%",
+  selectedImage: {
+    width: 300,
     height: 300,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 10,
   },
   formContainer: {
     backgroundColor: "#eeedeb",
@@ -186,7 +198,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   button: {
-    width: "45%",
+    width: "70%",
     height: 50,
     backgroundColor: "#466546",
     borderRadius: 10,
@@ -204,18 +216,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontFamily: "Rubik_300Light",
-  },
-  captureButton: {
-    position: "absolute",
-    bottom: 20,
-    backgroundColor: "#466546",
-    padding: 15,
-    borderRadius: 10,
-  },
-  captureButtonText: {
     color: "white",
     fontSize: 16,
     fontFamily: "Rubik_300Light",
