@@ -12,72 +12,58 @@ const RegisteredFoodScreen = () => {
     carregarRefeicoes();
   }, []);
 
-
   const carregarRefeicoes = async () => {
     try {
-    
-      const userId = await AsyncStorage.getItem('userId');
+      const userId = await AsyncStorage.getItem("userId");
 
       const url = `https://nutrilife-api.onrender.com/NutriLife/api/meals/get/${userId}`;
-      
-    
+
       const response = await fetch(url, {
-        mode: 'cors',
+        mode: "cors",
       });
 
-      
       if (!response.ok) {
-        throw new Error('Não foi possível encontrar as refeições');
+        throw new Error("Não foi possível encontrar as refeições");
       }
 
-    
       const data = await response.json();
 
-      
-      setRefeicoes(data); 
+      setRefeicoes(data);
     } catch (error) {
-      console.error('Erro ao carregar refeições:', error.message);
+      console.error("Erro ao carregar refeições:", error.message);
     }
   };
-
 
   const mostrarDetalhe = async (id) => {
     try {
-
       const url = `https://nutrilife-api.onrender.com/NutriLife/api/meals/get/id/${id}`;
-      
-     
+
       const response = await fetch(url, {
-        mode: 'cors',
+        mode: "cors",
       });
 
-    
       if (!response.ok) {
-        throw new Error('Não foi possível obter as informações da receita');
+        throw new Error("Não foi possível obter as informações da receita");
       }
 
-      
       const receita = await response.json();
 
-    
-      setReceitaSelecionada(receita); 
+      setReceitaSelecionada(receita);
     } catch (error) {
-      console.error('Erro ao carregar detalhes da receita:', error.message);
+      console.error("Erro ao carregar detalhes da receita:", error.message);
     }
   };
 
-
   const fecharDetalhe = () => {
-    setReceitaSelecionada(null); 
+    setReceitaSelecionada(null);
   };
 
- 
   const criarElementoRefeicao = (refeicao) => {
     return (
       <TouchableOpacity
         key={refeicao._id}
         style={styles.cardFoodContainer}
-        onPress={() => mostrarDetalhe(refeicao._id)} 
+        onPress={() => mostrarDetalhe(refeicao._id)}
       >
         <View style={styles.cardFood}>
           <Image
@@ -91,7 +77,6 @@ const RegisteredFoodScreen = () => {
     );
   };
 
-  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -105,13 +90,12 @@ const RegisteredFoodScreen = () => {
         {refeicoes.map((refeicao) => criarElementoRefeicao(refeicao))}
       </View>
 
-      
       {receitaSelecionada && (
         <View style={styles.overlay}>
           <View style={styles.overlayInner}>
             <TouchableOpacity onPress={fecharDetalhe} style={styles.close}>
               <Image
-                source={require('../assets/fechar.png')} 
+                source={require("../assets/fechar.png")}
                 style={styles.closeIcon}
               />
             </TouchableOpacity>
@@ -121,7 +105,9 @@ const RegisteredFoodScreen = () => {
               resizeMode="cover"
             />
             <Text style={styles.overlayTitle}>{receitaSelecionada.title}</Text>
-            <Text style={styles.overlayDescription}>{receitaSelecionada.description}</Text>
+            <Text style={styles.overlayDescription}>
+              {receitaSelecionada.description}
+            </Text>
           </View>
         </View>
       )}
@@ -152,8 +138,7 @@ const styles = StyleSheet.create({
     fontFamily: "Rubik_500Medium",
   },
   cardContainer: {
-    flex: 1,
-    justifyContent: "top",
+    justifyContent: "center",
     alignItems: "center",
     marginTop: 15,
   },
@@ -162,7 +147,7 @@ const styles = StyleSheet.create({
   },
   cardFood: {
     height: 150,
-    width: "90%",
+    width: 250,
     backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
@@ -179,8 +164,9 @@ const styles = StyleSheet.create({
   },
   cardFoodImage: {
     width: "40%",
-    height: "100%",
+    height: "80%",
     borderRadius: 10,
+    marginLeft: 10,
   },
   cardFoodTitle: {
     fontSize: 18,
@@ -201,8 +187,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: "90%",
-    maxWidth: 600,
+    width: "80%",
+    height: 500,
   },
   close: {
     position: "absolute",
@@ -215,8 +201,8 @@ const styles = StyleSheet.create({
     height: 20,
   },
   overlayImage: {
-    width: "100%",
-    height: 200,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     marginBottom: 10,
   },

@@ -11,8 +11,12 @@ import {
 } from "react-native";
 import { Ionicons } from "react-native-vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts, Rubik_300Light, Rubik_500Medium } from "@expo-google-fonts/rubik";
-import { Camera } from 'expo-camera';
+import {
+  useFonts,
+  Rubik_300Light,
+  Rubik_500Medium,
+} from "@expo-google-fonts/rubik";
+import { Camera } from "expo-camera";
 
 export function RegisterFoodScreen() {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
@@ -25,29 +29,29 @@ export function RegisterFoodScreen() {
 
   // Função para abrir a câmera
   const handleOpenCamera = async () => {
-    console.log('Chamando handleOpenCamera...');
-  
-    if (!fontsLoaded) {
-      console.log('As fontes ainda não estão carregadas.');
-      return; // Evita abrir a câmera antes que as fontes estejam carregadas
-    }
-  
+    console.log("Chamando handleOpenCamera...");
+
     try {
-      console.log('Aguardando permissão para acessar a câmera...');
+      console.log("Aguardando permissão para acessar a câmera...");
       const { status } = await Camera.requestPermissionsAsync();
-  
-      if (status !== 'granted') {
-        Alert.alert('Permissão necessária', 'É necessário permitir o acesso à câmera para usar esta funcionalidade.');
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Permissão necessária",
+          "É necessário permitir o acesso à câmera para usar esta funcionalidade."
+        );
         return;
       }
-  
+
       setIsCameraOpen(true);
     } catch (error) {
-      console.error('Erro ao solicitar permissão de câmera:', error);
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar acessar a câmera. Verifique suas configurações e tente novamente.');
+      console.error("Erro ao solicitar permissão de câmera:", error);
+      Alert.alert(
+        "Erro",
+        "Ocorreu um erro ao tentar acessar a câmera. Verifique suas configurações e tente novamente."
+      );
     }
   };
-  
 
   // Função para capturar a imagem
   const handleCaptureImage = async () => {
@@ -61,12 +65,12 @@ export function RegisterFoodScreen() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.returnArrow}
         >
           <Ionicons name="arrow-back" size={25} color="white" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.headerTitle}>Registrar Refeição</Text>
       </View>
       {isCameraOpen ? (
@@ -77,7 +81,10 @@ export function RegisterFoodScreen() {
             type={Camera.Constants.Type.back}
             ratio="16:9"
           />
-          <TouchableOpacity style={styles.captureButton} onPress={handleCaptureImage}>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={handleCaptureImage}
+          >
             <Text style={styles.captureButtonText}>Capturar</Text>
           </TouchableOpacity>
           <View style={styles.overlay} />
@@ -140,17 +147,17 @@ const styles = StyleSheet.create({
   },
   cameraContainer: {
     flex: 1,
-    backgroundColor: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
   },
   cameraPreview: {
-    width: '100%',
+    width: "100%",
     height: 300,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Ajuste a opacidade ou cor conforme necessário
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   formContainer: {
     backgroundColor: "#eeedeb",
@@ -202,16 +209,16 @@ const styles = StyleSheet.create({
     fontFamily: "Rubik_300Light",
   },
   captureButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    backgroundColor: '#466546',
+    backgroundColor: "#466546",
     padding: 15,
     borderRadius: 10,
   },
   captureButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontFamily: 'Rubik_300Light',
+    fontFamily: "Rubik_300Light",
   },
 });
 
