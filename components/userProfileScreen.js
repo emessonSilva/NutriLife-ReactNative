@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,22 +13,71 @@ import {
   Rubik_500Medium,
 } from "@expo-google-fonts/rubik";
 import { Ionicons } from "react-native-vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import AppLoading from "expo-app-loading";
 
 const UserProfileScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
 
-  const handleSaveChanges = () => {
-    // Lógica para salvar as mudanças
-    alert("Mudanças salvas!");
+  const loadUserData = async () => {
+    try {
+      const id = await AsyncStorage.getItem("userId");
+      const url = `https://nutrilife-api.onrender.com/NutriLife/api/users/get/${id}`;
+      const response = await fetch(url, {
+        mode: "cors",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao carregar os dados do usuário");
+      }
+
+      const user = await response.json();
+      setName(user.name);
+      setEmail(user.email);
+    } catch (error) {
+      console.error("Erro ao carregar os dados do usuário:", error);
+    }
   };
 
-  // const togglePasswordVisibility = () => {
-  //   setShowPassword(!showPassword);
-  // };
+  const updateUserData = async () => {
+    try {
+      const id = await AsyncStorage.getItem("userId");
+      const updatedData = {};
+      updatedData.name = name;
+      updatedData.email = email;
+
+      const url = `https://nutrilife-api.onrender.com/NutriLife/api/users/update/${id}`;
+      const response = await fetch(url, {
+        mode: "cors",
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar os dados do usuário");
+      }
+
+      const user = await response.json();
+      setName(user.name);
+      setEmail(user.email);
+      console.log("Dados do usuário atualizados com sucesso:", user);
+    } catch (error) {
+      console.error("Erro ao atualizar os dados do usuário:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -60,30 +109,11 @@ const UserProfileScreen = ({ navigation }) => {
             placeholder="Email"
             keyboardType="email-address"
           />
-
-          {/* <Text style={styles.label}>Senha:</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Senha"
-          secureTextEntry={!showPassword}
-        />
-        <View style={styles.showPassword}>
-          <TouchableOpacity onPress={togglePasswordVisibility}>
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="#ccc"
-            />
-          </TouchableOpacity>
-          <Text style={styles.showPasswordLabel}>Mostrar senha</Text>
-        </View> */}
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleSaveChanges}>
+        <TouchableOpacity style={styles.button} onPress={updateUserData}>
           <Text style={styles.buttonText}>Salvar Mudanças</Text>
         </TouchableOpacity>
       </View>
@@ -107,12 +137,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 25,
     color: "#fff",
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: "Rubik_300Light",
   },
   containerForm: {
-    display: 'flex',
-    alignItems: 'center'
+    display: "flex",
+    alignItems: "center",
   },
   form: {
     backgroundColor: "#eeedeb",
@@ -135,14 +165,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#dee3dd",
     fontSize: 15,
   },
-  // showPassword: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  // },
-  // showPasswordLabel: {
-  //   marginLeft: 10,
-  //   fontSize: 15,
-  // },
   buttonContainer: {
     alignItems: "center",
     marginTop: 20,
