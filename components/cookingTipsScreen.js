@@ -15,7 +15,6 @@ import {
 import AppLoading from "expo-app-loading";
 import { Ionicons } from "react-native-vector-icons";
 
-
 const CookingTipsScreen = ({ navigation }) => {
   const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
   const [receitas, setReceitas] = useState([]);
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
   },
   cardFoodContainer: {
     marginBottom: 20,
-    width: "90%",
+    width: "100%",
   },
   cardFood: {
     height: 150,
@@ -205,8 +204,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: "80%",
-    height: 500,
+    width: "100%",
+    height: 700,
   },
   closeButton: {
     position: "absolute",

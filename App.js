@@ -94,6 +94,4 @@ function MainDrawerScreen() {
   );
 }
 
-
-
 export default App;

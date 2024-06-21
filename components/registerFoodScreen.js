@@ -11,7 +11,6 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
 
 export function RegisterFoodScreen() {
   const [title, setTitle] = useState("");
@@ -21,8 +20,10 @@ export function RegisterFoodScreen() {
 
   const handlePickImage = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log("Permissão de acesso à galeria:", status);
+
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
@@ -37,28 +38,45 @@ export function RegisterFoodScreen() {
         aspect: [4, 3],
         quality: 1,
       });
+      console.log("Resultado da seleção de imagem:", result);
 
       if (!result.cancelled) {
         const formData = new FormData();
+        const localUri = result.uri;
+        const filename = localUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
         formData.append("file", {
-          uri: result.uri,
-          type: "image/jpeg", // ou "image/png" dependendo do tipo da imagem
-          name: `upload_${Date.now()}`,
+          uri: localUri,
+          type: type,
+          name: filename,
         });
         formData.append("upload_preset", "r2hjf5ed");
 
-        const response = await axios.post(
+        console.log("FormData:", formData); // Verifica o FormData antes do envio
+
+        const response = await fetch(
           "https://api.cloudinary.com/v1_1/dfrngbz8u/image/upload",
-          formData,
           {
+            method: "POST",
+            body: formData,
             headers: {
               "Content-Type": "multipart/form-data",
             },
           }
         );
 
-        if (response.data.secure_url) {
-          setSelectedImage(response.data.secure_url);
+        const data = await response.json();
+        console.log("Resposta do Cloudinary:", data);
+
+        if (data.secure_url) {
+          setSelectedImage(data.secure_url);
+        } else {
+          Alert.alert(
+            "Erro ao enviar imagem",
+            "Ocorreu um problema ao enviar a imagem. Tente novamente mais tarde."
+          );
         }
       }
     } catch (error) {
@@ -79,22 +97,24 @@ export function RegisterFoodScreen() {
         img_url: selectedImage,
       };
 
-      // Substituir pela URL correta da sua API e o método correto (POST, PUT, etc.)
-      const response = await axios.post('https://nutrilife-api.onrender.com/NutriLife/api/meals/create/', mealData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        "https://nutrilife-api.onrender.com/NutriLife/api/meals/create/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(mealData),
+        }
+      );
 
       if (response.ok) {
-        console.log('Refeição cadastrada com sucesso!');
-        navigation.navigate('MainDrawer');
-        // Navegar para a próxima tela ou realizar ações necessárias
+        console.log("Refeição cadastrada com sucesso!");
       } else {
-        console.error('Erro ao cadastrar refeição:', response.statusText);
+        console.error("Erro ao cadastrar refeição:", response.statusText);
       }
     } catch (error) {
-      console.error('Erro ao cadastrar refeição:', error.message);
+      console.error("Erro ao cadastrar refeição:", error.message);
     }
   };
 

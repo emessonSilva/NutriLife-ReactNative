@@ -1,243 +1,154 @@
-import { React, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import { CheckBox } from "react-native-elements";
-import {
-  useFonts,
-  Rubik_300Light,
-  Rubik_500Medium,
-} from "@expo-google-fonts/rubik";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import AppLoading from "expo-app-loading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function RegisterScreen() {
+const RegisteredFoodScreen = () => {
   const navigation = useNavigation();
-  const [fontsLoaded] = useFonts({ Rubik_300Light, Rubik_500Medium });
+  const [refeicoes, setRefeicoes] = useState([]);
+  const [receitaSelecionada, setReceitaSelecionada] = useState(null);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [checkedItems, setCheckedItems] = useState([]);
+  useEffect(() => {
+    carregarRefeicoes();
+  }, []);
 
-  const handleCheckboxToggle = (value) => {
-    if (checkedItems.includes(value)) {
-      setCheckedItems(checkedItems.filter((item) => item !== value));
-    } else {
-      setCheckedItems([...checkedItems, value]);
-    }
-  };
-
-  const handleRegister = async () => {
+  const carregarRefeicoes = async () => {
     try {
-      const userData = {
-        email,
-        name,
-        preferences: checkedItems,
-        password,
-      };
+      const userId = await AsyncStorage.getItem("userId");
 
-      const response = await fetch(
-        "https://nutrilife-api.onrender.com/NutriLife/api/users/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        }
-      );
+      const url = `https://nutrilife-api.onrender.com/NutriLife/api/meals/get/${userId}`;
+
+      const response = await fetch(url, {
+        mode: "cors",
+      });
 
       if (!response.ok) {
-        throw new Error("Erro ao criar conta");
+        throw new Error("Não foi possível encontrar as refeições");
       }
 
-      navigation.navigate("Login");
+      const data = await response.json();
+
+      setRefeicoes(data);
     } catch (error) {
-      Alert.alert("Erro ao criar conta", error.message);
+      console.error("Erro ao carregar refeições:", error.message);
     }
   };
 
-  const goToLogin = () => {
-    navigation.navigate("Login");
+  const mostrarDetalhe = async (id) => {
+    try {
+      const url = `https://nutrilife-api.onrender.com/NutriLife/api/meals/get/id/${id}`;
+
+      const response = await fetch(url, {
+        mode: "cors",
+      });
+
+      if (!response.ok) {
+        throw new Error("Não foi possível obter as informações da receita");
+      }
+
+      const receita = await response.json();
+
+      setReceitaSelecionada(receita);
+    } catch (error) {
+      console.error("Erro ao carregar detalhes da receita:", error.message);
+    }
   };
 
-  // Verifica se as fontes não estão carregadas
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
+  const fecharDetalhe = () => {
+    setReceitaSelecionada(null);
+  };
+
+  const criarElementoRefeicao = (refeicao) => {
+    return (
+      <TouchableOpacity
+        key={refeicao._id}
+        style={styles.cardFoodContainer}
+        onPress={() => mostrarDetalhe(refeicao._id)}
+      >
+        <View style={styles.cardFood}>
+          <Image
+            source={{ uri: refeicao.img_url }}
+            style={styles.cardFoodImage}
+            resizeMode="cover"
+          />
+          <Text style={styles.cardFoodTitle}>{refeicao.title}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <View>
-        <Image
-          source={require("../assets/NutriLife-logo.png")}
-          style={styles.logo}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.returnArrow}
         />
+        <Text style={styles.headerTitle}>Refeições Cadastradas</Text>
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>Registrar-se</Text>
-        <Text style={styles.subtitle}>
-          Parece que você ainda não tem uma conta. Vamos criar uma para você.
-        </Text>
+      <View style={styles.cardContainer}>
+        {refeicoes.map((refeicao) => criarElementoRefeicao(refeicao))}
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Nome"
-          placeholderTextColor="#6B6869"
-          autoCorrect={false}
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#6B6869"
-          autoCorrect={false}
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          placeholder="Senha"
-          placeholderTextColor="#6B6869"
-          secureTextEntry
-          autoCorrect={false}
-          style={[styles.input]}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <Text style={styles.checkboxContainerTitle}>
-          Preferências Alimentares
-        </Text>
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            title="Vegano"
-            checked={checkedItems.includes("vegan")}
-            onPress={() => handleCheckboxToggle("vegan")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Vegetariano"
-            checked={checkedItems.includes("vegetarian")}
-            onPress={() => handleCheckboxToggle("vegetarian")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Sem glúten"
-            checked={checkedItems.includes("gluten-free")}
-            onPress={() => handleCheckboxToggle("gluten-free")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Sem leite"
-            checked={checkedItems.includes("lactose-free")}
-            onPress={() => handleCheckboxToggle("lactose-free")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Baixo Carboidrato"
-            checked={checkedItems.includes("low-carb")}
-            onPress={() => handleCheckboxToggle("low-carb")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Pouca Gordura"
-            checked={checkedItems.includes("low-fat")}
-            onPress={() => handleCheckboxToggle("low-fat")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-          <CheckBox
-            title="Orgânico"
-            checked={checkedItems.includes("organic")}
-            onPress={() => handleCheckboxToggle("organic")}
-            containerStyle={styles.checkbox}
-            textStyle={styles.checkboxText}
-          />
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>CRIAR CONTA</Text>
-        </TouchableOpacity>
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>
-            Já tem uma conta?{" "}
-            <TouchableOpacity onPress={goToLogin}>
-              <Text style={styles.link}>Entre</Text>
+
+      {receitaSelecionada && (
+        <View style={styles.overlay}>
+          <View style={styles.overlayInner}>
+            <TouchableOpacity onPress={fecharDetalhe} style={styles.close}>
+              <Image
+                source={require("../assets/fechar.png")}
+                style={styles.closeIcon}
+              />
             </TouchableOpacity>
-          </Text>
+            <Image
+              source={{ uri: receitaSelecionada.img_url }}
+              style={styles.overlayImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.overlayTitle}>{receitaSelecionada.title}</Text>
+            <Text style={styles.overlayDescription}>
+              {receitaSelecionada.description}
+            </Text>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EEEDEB",
+    backgroundColor: "#466546",
+    padding: 20,
+    position: "relative",
   },
-  logo: {
-    width: 140,
-    height: 120,
-    marginBottom: 50,
+  returnArrow: {
+    position: "absolute",
+    left: 20,
   },
-  textContainer: {
-    width: "90%",
-    alignItems: "flex-start",
-    marginHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333333",
-    marginBottom: 5,
+  headerTitle: {
+    color: "#fff",
+    fontSize: 20,
     fontFamily: "Rubik_500Medium",
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#333333",
-    textAlign: "left",
-    fontFamily: "Rubik_300Light",
-  },
-  inputContainer: {
-    width: "90%",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  input: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: "#DEE3DD",
-    padding: 15,
-    fontSize: 16,
-    marginBottom: 15,
-    fontFamily: "Rubik_300Light",
-  },
-  button: {
-    width: "60%",
-    height: 60,
-    marginTop: 40,
-    borderRadius: 10,
-    backgroundColor: "#466546",
-    alignItems: "center",
+  cardContainer: {
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: 15,
+  },
+  cardFoodContainer: {
     marginBottom: 20,
+  },
+  cardFood: {
+    height: 150,
+    width: "100%",
+    backgroundColor: "#dee3dd",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -245,54 +156,68 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 12,
-    elevation: 5,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontFamily: "Rubik_500Medium",
-  },
-  checkboxContainer: {
-    width: "100%",
-    alignItems: "flex-start",
+    elevation: 8,
+    borderRadius: 10,
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 20,
+    alignItems: "center",
+    marginTop: 30,
   },
-  checkbox: {
-    backgroundColor: "transparent",
-    borderWidth: 0,
-    margin: 0,
-    padding: 0,
-    marginLeft: 0,
+  cardFoodImage: {
+    width: "40%",
+    height: "80%",
+    borderRadius: 10,
+    marginLeft: 10,
   },
-  checkboxText: {
-    fontSize: 16,
-    marginLeft: 5,
+  cardFoodTitle: {
+    fontSize: 18,
+    marginLeft: 20,
     fontFamily: "Rubik_300Light",
   },
-  checkboxContainerTitle: {
-    display: "flex",
-    justifyContent: "flex-start",
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  link: {
-    color: "#466546",
-    fontSize: 15,
-    fontFamily: "Rubik_300Light",
-  },
-  loginContainer: {
-    marginTop: 20,
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  loginText: {
+  overlayInner: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    height: 500,
+  },
+  close: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+  },
+  closeIcon: {
+    width: 20,
+    height: 20,
+  },
+  overlayImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  overlayTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  overlayDescription: {
     fontSize: 16,
-    color: "#333333",
-    fontFamily: "Rubik_300Light",
+    lineHeight: 24,
+    textAlign: "center",
   },
 });
 
-export default RegisterScreen;
+export default RegisteredFoodScreen;

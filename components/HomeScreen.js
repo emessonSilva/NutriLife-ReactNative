@@ -90,10 +90,7 @@ function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        region={region}
-      >
+      <MapView style={styles.map} region={region}>
         {location && (
           <>
             <Marker
@@ -107,7 +104,7 @@ function MapScreen() {
             <Marker
               coordinate={{
                 latitude: -8.051264176767653,
-                longitude: -34.8891208889249
+                longitude: -34.8891208889249,
               }}
               title={"O Vegetariano Restaurante"}
               description={"Restaurante vegano aqui"}
@@ -116,7 +113,7 @@ function MapScreen() {
             <Marker
               coordinate={{
                 latitude: -8.057859274091719,
-                longitude: -34.88115727862078
+                longitude: -34.88115727862078,
               }}
               title={"Restaurante Vida Longa"}
               description={"Restaurante vegano aqui"}
@@ -125,7 +122,7 @@ function MapScreen() {
             <Marker
               coordinate={{
                 latitude: -8.057604324164435,
-                longitude: -34.88150060137855
+                longitude: -34.88150060137855,
               }}
               title={"VEGostices"}
               description={"Comida Nordestina Vegana"}
